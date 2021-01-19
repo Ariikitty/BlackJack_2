@@ -1,4 +1,6 @@
 #include <iostream>
+// Number of cards in play
+int cardsPlayed = 0;
 // Builds a card object
 struct card {
     char suit;
@@ -13,6 +15,7 @@ struct player_hand {
 // Declears functions
 void new_deck(card(&cards)[52]);
 void shuffle(card cards[], int n);
+void draw_card(card playerCards[], card cards[], player_hand p_hand);
 // Main code execution
 int main()
 {
@@ -20,15 +23,20 @@ int main()
 
     // Array from 0 to 51 
     card cards[52];
-    card playerHand[5];
+    card playerCards[5]{ 0 };
+
+    player_hand p_hand;
 
     new_deck(cards);
     shuffle(cards, 52);
+    draw_card(playerCards, cards, p_hand);
 
     // Printing all shuffled elements of cards 
     for (int i = 0; i < 52; i++)
         std::cout << cards[i].rank << cards[i].suit << cards[i].value  << " ";
     std::cout << std::endl;
+
+    std::cout << playerCards[0].rank << playerCards[0].suit << std::endl;
 
     return 0;
 }
@@ -132,7 +140,9 @@ void new_deck(card(&cards)[52]) {
     }
 }
 
-void draw_card()
+void draw_card(card playerCards[], card cards[], player_hand p_hand)
 {
-
+    playerCards[p_hand.size] = cards[cardsPlayed];
+    p_hand.size += 1;
+    cardsPlayed += 1;
 }
