@@ -12,31 +12,41 @@ struct player_hand {
     int size;
     int value;
 };
+// Builds a dealer's hand object
+struct dealer_hand {
+    int size;
+    int value;
+};
 // Declears functions
 void new_deck(card(&cards)[52]);
 void shuffle(card cards[], int n);
 void draw_card(card playerCards[], card cards[], player_hand p_hand);
+void dealer_draw(card dealerCards[], card cards[], dealer_hand d_hand);
 // Main code execution
 int main()
 {
+    // Set's the seed
     srand(time(0));
-
     // Array from 0 to 51 
     card cards[52];
     card playerCards[5]{ 0 };
-
-    player_hand p_hand;
+    card dealerCards[5]{ 0 };
+    // Initialises the hand structs
+    player_hand p_hand{ 0, 0 };
+    dealer_hand d_hand{ 0, 0 };
 
     new_deck(cards);
     shuffle(cards, 52);
     draw_card(playerCards, cards, p_hand);
+    dealer_draw(dealerCards, cards, d_hand);
 
     // Printing all shuffled elements of cards 
     for (int i = 0; i < 52; i++)
         std::cout << cards[i].rank << cards[i].suit << cards[i].value  << " ";
     std::cout << std::endl;
-
+    std::cout << std::endl;
     std::cout << playerCards[0].rank << playerCards[0].suit << std::endl;
+    std::cout << p_hand.value << std::endl;
 
     return 0;
 }
@@ -139,10 +149,19 @@ void new_deck(card(&cards)[52]) {
         }
     }
 }
-
+// Function for player draw
 void draw_card(card playerCards[], card cards[], player_hand p_hand)
 {
     playerCards[p_hand.size] = cards[cardsPlayed];
+    p_hand.value += playerCards[p_hand.size].value;
     p_hand.size += 1;
+    cardsPlayed += 1;
+}
+// Function for dealer draw
+void dealer_draw(card dealerCards[], card cards[], dealer_hand d_hand)
+{
+    dealerCards[d_hand.size] = cards[cardsPlayed];
+    d_hand.value += cards[cardsPlayed].value;
+    d_hand.size += 1;
     cardsPlayed += 1;
 }
