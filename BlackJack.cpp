@@ -73,23 +73,43 @@ int main()
 				{
 				case 1:
 					draw_card(playerCards, cards, p_hand);
+					win_check(p_hand, d_hand);
 					break;
 				case 2:
 					playerTurn = 0;
 				}
 			} while (playerTurn == 1);
-			while (21 - d_hand.value > 5) {
-				dealer_draw(dealerCards, cards, d_hand);
-				draw_screen(dealerCards, d_hand, p_hand, playerCards, pot, balence, cards);
-			};
+			if (playerWinState == 0) {
+				while (21 - d_hand.value > 5) {
+					dealer_draw(dealerCards, cards, d_hand);
+					win_check(p_hand, d_hand);
+				};
+			}
 			draw_screen(dealerCards, d_hand, p_hand, playerCards, pot, balence, cards);
+			gameend_check(p_hand, d_hand);
+			switch (playerWinState)
+			{
+			case 0:
+				std::cout << "You lost, better luck next time!";
+				break;
+			case 1:
+				std::cout << "You went bust, be more careful next time!";
+				break;
+			case 2:
+				std::cout << "You won!! You got " << pot;
+				balence += pot;
+				break;
+			case 3:
+				std::cout << "You both got the same value, you neither won or lost";
+				balence += bet;
+			}
 			Sleep(5000);
 			break;
 		case 3:
 			// How to play here
 			break;
 		default:
-			// There is a bug here if the user enters a letter, this will just loop. I'm not sure what causes it or how to fix it :c
+			// FIX THIS: There is a bug here if the user enters a letter, this will just loop. I'm not sure what causes it or how to fix it :c
 			system("cls");
 			std::cout << "You have entered an invalid option.\nPlease enter a number between 1 and 3!" << std::endl;
 			std::cout << std::endl;
@@ -253,4 +273,39 @@ void draw_screen(card dealerCards[], dealer_hand d_hand, player_hand p_hand, car
 	}
 	std::cout << std::setw(8) << "Total: " << p_hand.value;
 	std::cout << std::setw(12) << "Balance: " << balence << std::endl;
+}
+
+void win_check(player_hand p_hand, dealer_hand d_hand)
+{
+	if (p_hand.value == 21)
+	{
+		playerTurn = 0;
+		gamePlaying = 0;
+		playerWinState = 2;
+	} else if (p_hand.value > 21) {
+		playerTurn = 0;
+		gamePlaying = 0;
+		playerWinState = 1;
+	}
+	else if (d_hand.value > 21) {
+		gamePlaying = 0;
+		playerWinState = 2;
+	}
+}
+
+void gameend_check(player_hand p_hand, dealer_hand d_hand)
+{
+	if (p_hand.value < 21 && p_hand.value > d_hand.value)
+	{
+		gamePlaying = 0;
+		playerWinState = 2;
+	}
+	else if (p_hand.value == d_hand.value) {
+		gamePlaying = 0;
+		playerWinState = 3;
+	}
+	else if (d_hand.value > p_hand.value) {
+		gamePlaying = 0;
+		playerWinState = 0;
+	}
 }
