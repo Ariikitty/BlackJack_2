@@ -9,7 +9,8 @@ int main()
 	srand(time(0));
 	// Array from 0 to 51 
 	card cards[52];
-	//Start's game
+	// Initialisation of needed veriables for the menus
+	int d_choice = 0;
 	int choice = 0;
 	float balence = 500;
 	do {
@@ -33,6 +34,7 @@ int main()
 		std::cout << "1: Quit game" << std::endl;
 		std::cout << "2: Play game" << std::endl;
 		std::cout << "3: How to play" << std::endl;
+		std::cout << "4: Debug mode" << std::endl;
 		std::cout << std::endl;
 		std::cout << "What would you like to do (Please enter a number): ";
 		std::cin >> choice;
@@ -53,12 +55,14 @@ int main()
 			std::cin >> bet;
 			balence -= bet;
 			pot = bet * 2;
+			playerWinState = 4;
 			new_deck(cards);
 			shuffle(cards, 52);
 			for (int i = 0; i < 2; i++) {
 				draw_card(playerCards, cards, p_hand);
 				dealer_draw(dealerCards, cards, d_hand);
 			}
+			ace_rule(playerCards, p_hand, dealerCards, d_hand);
 			do {
 				int choice = 0;
 				draw_screen(dealerCards, d_hand, p_hand, playerCards, pot, balence, cards);
@@ -73,15 +77,17 @@ int main()
 				{
 				case 1:
 					draw_card(playerCards, cards, p_hand);
+					ace_rule(playerCards, p_hand, dealerCards, d_hand);
 					win_check(p_hand, d_hand);
 					break;
 				case 2:
 					playerTurn = 0;
 				}
 			} while (playerTurn == 1);
-			if (playerWinState == 0) {
-				while (21 - d_hand.value > 5) {
+			if (playerWinState == 4) {
+				while (21 - d_hand.value > 4) {
 					dealer_draw(dealerCards, cards, d_hand);
+					ace_rule(playerCards, p_hand, dealerCards, d_hand);
 					win_check(p_hand, d_hand);
 				};
 			}
@@ -102,11 +108,34 @@ int main()
 			case 3:
 				std::cout << "You both got the same value, you neither won or lost";
 				balence += bet;
+				break;
 			}
 			Sleep(5000);
 			break;
 		case 3:
 			// How to play here
+			break;
+		case 4:
+			system("cls");
+			std::cout << "Are you sure you want to turn on debug mode? (This will ruin the game)" << std::endl;
+			std::cout << "1: yes" << std::endl;
+			std::cout << "2: no" << std::endl;
+			std::cout << std::endl;
+			std::cout << "Please enter a number: ";
+			std::cin >> d_choice;
+			switch (d_choice)
+			{
+			case 1:
+				debugMode = 1;
+				std::cout << "Debug mode is now on. To turn it off, go back into the debug mode and choose no";
+				Sleep(2000);
+				break;
+			case 2:
+				debugMode = 0;
+				std::cout << "Debug mode is now off";
+				Sleep(2000);
+				break;
+			}
 			break;
 		default:
 			// FIX THIS: There is a bug here if the user enters a letter, this will just loop. I'm not sure what causes it or how to fix it :c
@@ -248,7 +277,7 @@ void draw_screen(card dealerCards[], dealer_hand d_hand, player_hand p_hand, car
 {
 	system("cls");
 	std::cout << std::setw(0) << "Dealer";
-	if (playerTurn == 1) {
+	if (playerTurn == 1 && debugMode == 0) {
 		std::cout << std::setw(4) << "??";
 		for (int i = 0; i < 4; i++)
 		{
@@ -282,7 +311,13 @@ void win_check(player_hand p_hand, dealer_hand d_hand)
 		playerTurn = 0;
 		gamePlaying = 0;
 		playerWinState = 2;
-	} else if (p_hand.value > 21) {
+	}
+	else if (p_hand.size == 5) {
+		playerTurn = 0;
+		gamePlaying = 0;
+		playerWinState = 2;
+	}
+	else if (p_hand.value > 21) {
 		playerTurn = 0;
 		gamePlaying = 0;
 		playerWinState = 1;
@@ -304,8 +339,48 @@ void gameend_check(player_hand p_hand, dealer_hand d_hand)
 		gamePlaying = 0;
 		playerWinState = 3;
 	}
+	else if (d_hand.value > 21) {
+		gamePlaying = 0;
+		playerWinState = 2;
+	}
 	else if (d_hand.value > p_hand.value) {
 		gamePlaying = 0;
 		playerWinState = 0;
+	}
+}
+
+void ace_rule(card playerCards[], player_hand& p_hand, card dealerCards[], dealer_hand& d_hand)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		if (playerCards[i].value == 1)
+		{
+			playerCards[i].value = 11;
+			p_hand.value += 10;
+		}
+		if (p_hand.value > 21)
+		{
+			if (playerCards[i].value == 11)
+			{
+				playerCards[i].value = 1;
+				p_hand.value -= 10;
+			}
+		}
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		if (dealerCards[i].value == 1)
+		{
+			dealerCards[i].value = 11;
+			d_hand.value += 10;
+		}
+		if (d_hand.value > 21)
+		{
+			if (dealerCards[i].value == 11)
+			{
+				dealerCards[i].value = 1;
+				d_hand.value -= 10;
+			}
+		}
 	}
 }
