@@ -12,15 +12,15 @@ int main()
 	// Initialisation of needed veriables for the menus
 	int d_choice = 0;
 	int choice = 0;
-	float balence = 500;
+	float balance = 500;
 	do {
 		// Writes the title of the program
 		system("cls");
 		std::cout << "Blackjack 21" << std::endl;
 		std::cout << "------------" << std::endl;
-		std::cout << "Your balance is " << balence << std::endl;
+		std::cout << "Your balance is " << balance << std::endl;
 		// This will check if the user has any money left. If they don't then the program will exit
-		if (balence < 1)
+		if (balance < 1)
 		{
 			std::cout << "You are out of money. Thanks for playing!" << std::endl;
 			Sleep(2000);
@@ -57,7 +57,7 @@ int main()
 			system("cls");
 			std::cout << "How much would you like to bet? ";
 			std::cin >> bet;
-			balence -= bet;
+			balance -= bet;
 			pot = bet * 2;
 			playerWinState = 4;
 			// Creates a new deck of cards
@@ -75,7 +75,7 @@ int main()
 				// Asks the player if they want to hit or stick
 				int choice = 0;
 				// draw_screen will draw the screen with the set UI layout
-				draw_screen(dealerCards, d_hand, p_hand, playerCards, pot, balence, cards);
+				draw_screen(dealerCards, d_hand, p_hand, playerCards, pot, balance, cards);
 				std::cout << std::endl;
 				std::cout << "You are under by " << 21 - p_hand.value << std::endl;
 				std::cout << "What would you like to do?" << std::endl;
@@ -108,7 +108,7 @@ int main()
 				};
 			}
 			// Draws the screen with the UI of the game
-			draw_screen(dealerCards, d_hand, p_hand, playerCards, pot, balence, cards);
+			draw_screen(dealerCards, d_hand, p_hand, playerCards, pot, balance, cards);
 			// Gameend_check is similar to win_check but is only called after the game to see who wins on value
 			gameend_check(p_hand, d_hand);
 			// Switch statement to decide on how the player finished the game
@@ -125,12 +125,12 @@ int main()
 			case 2:
 				// Called when the player gets exactly 21, has 5 cards in their hand without going bust or scores higher then the dealer
 				std::cout << "You won!! You got " << pot;
-				balence += pot;
+				balance += pot;
 				break;
 			case 3:
 				// Called when the player and the dealer score the exact same value
 				std::cout << "You both got the same value, you neither won or lost";
-				balence += bet;
+				balance += bet;
 				break;
 			}
 			// Pauses on the game end screen for 5 seconds before continuing back to the menu
@@ -317,7 +317,7 @@ void dealer_draw(card dealerCards[], card cards[], dealer_hand& d_hand)
 	cardsPlayed += 1;
 }
 // Function to draw the screen
-void draw_screen(card dealerCards[], dealer_hand d_hand, player_hand p_hand, card playerCards[], float pot, float balence, card cards[])
+void draw_screen(card dealerCards[], dealer_hand d_hand, player_hand p_hand, card playerCards[], float pot, float balance, card cards[])
 {
 	system("cls");
 	std::cout << std::setw(0) << "Dealer";
@@ -345,7 +345,7 @@ void draw_screen(card dealerCards[], dealer_hand d_hand, player_hand p_hand, car
 		std::cout << std::setw(3) << playerCards[i].rank << playerCards[i].suit;
 	}
 	std::cout << std::setw(8) << "Total: " << p_hand.value;
-	std::cout << std::setw(12) << "Balance: " << balence << std::endl;
+	std::cout << std::setw(12) << "Balance: " << balance << std::endl;
 }
 
 void win_check(player_hand p_hand, dealer_hand d_hand)
